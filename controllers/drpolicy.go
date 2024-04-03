@@ -25,7 +25,7 @@ func propagateS3Secret(
 	drClustersMutex.Lock()
 	defer drClustersMutex.Unlock()
 
-	for _, clusterName := range util.DrpolicyClusterNames(drpolicy) {
+	for _, clusterName := range util.DRPolicyClusterNames(drpolicy) {
 		if err := drClusterSecretsDeploy(clusterName, drpolicy, drclusters, secretsUtil,
 			hubOperatorRamenConfig, log); err != nil {
 			return err
@@ -63,7 +63,7 @@ func drClusterSecretsDeploy(
 		if err := secretsUtil.AddSecretToCluster(
 			secretName,
 			clusterName,
-			NamespaceName(),
+			RamenOperatorNamespace(),
 			drClusterOperatorNamespaceNameOrDefault(rmnCfg)); err != nil {
 			return fmt.Errorf("drcluster '%v' secret add '%v': %w", clusterName, secretName, err)
 		}
@@ -77,6 +77,7 @@ func drPolicyUndeploy(
 	drclusters *rmn.DRClusterList,
 	secretsUtil *util.SecretsUtil,
 	ramenConfig *rmn.RamenConfig,
+	log logr.Logger,
 ) error {
 	drpolicies := rmn.DRPolicyList{}
 
@@ -87,7 +88,7 @@ func drPolicyUndeploy(
 		return fmt.Errorf("drpolicies list: %w", err)
 	}
 
-	return drClustersUndeploySecrets(drpolicy, drclusters, drpolicies, secretsUtil, ramenConfig)
+	return drClustersUndeploySecrets(drpolicy, drclusters, drpolicies, secretsUtil, ramenConfig, log)
 }
 
 func drClustersUndeploySecrets(
@@ -96,6 +97,7 @@ func drClustersUndeploySecrets(
 	drpolicies rmn.DRPolicyList,
 	secretsUtil *util.SecretsUtil,
 	ramenConfig *rmn.RamenConfig,
+	log logr.Logger,
 ) error {
 	if !ramenConfig.DrClusterOperator.DeploymentAutomationEnabled ||
 		!ramenConfig.DrClusterOperator.S3SecretDistributionEnabled {
@@ -105,7 +107,7 @@ func drClustersUndeploySecrets(
 	mustHaveS3Secrets := map[string]sets.String{}
 
 	// Determine S3 secrets that must continue to exist per cluster in the policy being deleted
-	for _, clusterName := range util.DrpolicyClusterNames(drpolicy) {
+	for _, clusterName := range util.DRPolicyClusterNames(drpolicy) {
 		mustHaveS3Secrets[clusterName] = drClusterListMustHaveSecrets(drpolicies, drclusters, clusterName,
 			drpolicy, ramenConfig)
 	}
@@ -113,7 +115,7 @@ func drClustersUndeploySecrets(
 	// Determine S3 secrets that maybe deleted, based on policy being deleted
 	mayDeleteS3Secrets, err := drPolicySecretNames(drpolicy, drclusters, ramenConfig)
 	if err != nil {
-		return err
+		log.Error(err, "error in retrieving secret names")
 	}
 
 	// For each cluster in the must have S3 secrets list, check and delete
@@ -125,7 +127,7 @@ func drClustersUndeploySecrets(
 			}
 
 			// Delete s3profile secret from current cluster
-			if err := secretsUtil.RemoveSecretFromCluster(s3SecretToDelete, clusterName, NamespaceName()); err != nil {
+			if err := secretsUtil.RemoveSecretFromCluster(s3SecretToDelete, clusterName, RamenOperatorNamespace()); err != nil {
 				return fmt.Errorf("drcluster '%v' s3Profile '%v' secrets delete: %w",
 					clusterName, s3SecretToDelete, err)
 			}
@@ -173,7 +175,7 @@ func drClusterListMustHaveS3Profiles(drpolicies rmn.DRPolicyList,
 			continue
 		}
 
-		for _, cluster := range util.DrpolicyClusterNames(&drpolicies.Items[idx]) {
+		for _, cluster := range util.DRPolicyClusterNames(&drpolicies.Items[idx]) {
 			// Skip if not the current cluster
 			if cluster != clusterName {
 				continue
@@ -197,7 +199,7 @@ func drPolicySecretNames(drpolicy *rmn.DRPolicy,
 
 	var err error
 
-	for _, managedCluster := range util.DrpolicyClusterNames(drpolicy) {
+	for _, managedCluster := range util.DRPolicyClusterNames(drpolicy) {
 		mcProfileFound := false
 
 		s3ProfileName := ""

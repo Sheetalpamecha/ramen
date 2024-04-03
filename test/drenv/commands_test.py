@@ -8,6 +8,7 @@ from contextlib import contextmanager
 import pytest
 
 from drenv import commands
+from drenv import shutdown
 
 # Streaming data from commands.
 
@@ -250,6 +251,12 @@ os.write(1, bytes([0xff]))
         list(commands.watch("python3", "-c", script))
 
 
+def test_watch_after_shutdown(monkeypatch):
+    monkeypatch.setattr(shutdown, "_started", True)
+    with pytest.raises(shutdown.Started):
+        list(commands.watch("no-such-command"))
+
+
 # Running commands.
 
 
@@ -310,6 +317,11 @@ def test_run_non_ascii():
     assert output == "\u05d0\n"
 
 
+def test_run_no_decode():
+    data = commands.run("echo", "-n", b"\xd7\x90", decode=False)
+    assert data == b"\xd7\x90"
+
+
 def test_run_invalid_utf8():
     script = """
 import os
@@ -317,6 +329,12 @@ os.write(1, bytes([0xff]))
 """
     with pytest.raises(UnicodeDecodeError):
         commands.run("python3", "-c", script)
+
+
+def test_run_after_shutdown(monkeypatch):
+    monkeypatch.setattr(shutdown, "_started", True)
+    with pytest.raises(shutdown.Started):
+        commands.run("no-such-command")
 
 
 # Formatting errors.
