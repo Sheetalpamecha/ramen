@@ -21,12 +21,8 @@ environment.
 
    Logout and login again for the change above to be in effect.
 
-1. Install minikube, for example on RHEL/CentOS/Fedora:
-
-   ```
-   sudo dnf install https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
-   ```
-
+1. Install minikube.
+   To install Minikube follow the [official guide](https://minikube.sigs.k8s.io/docs/start/).
    Tested with version v1.33.1.
 
 1. Install the `kubectl` tool. See
