@@ -826,3 +826,25 @@ To log debug messages use:
 ```python
 test.debug("Got reply: %s", reply)
 ```
+
+## Troubleshooting drenv issues
+
+### podman commands are failing for rootless access
+
+Reported with Podman version 4.6.2 on Fedora 37.
+
+```
+$ podman version
+ERRO[0000] running /usr/bin/newuidmap 61879 0 1000 1 1 100000 65536: newuidmap:
+open of uid_map failed: Permission denied
+Error: cannot set up namespace using "/usr/bin/newuidmap": exit status 1
+```
+
+While running with root access it works fine.
+
+### Solution
+reinstall shadow-utils package:
+
+```
+sudo dnf reinstall shadow-utils
+```
