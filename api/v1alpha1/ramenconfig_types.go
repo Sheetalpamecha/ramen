@@ -6,7 +6,7 @@ package v1alpha1
 import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	configv1alpha1 "k8s.io/component-base/config/v1alpha1"
+        cfg "sigs.k8s.io/controller-runtime/pkg/config/v1alpha1"
 )
 
 // ControllerType is the type of controller to run

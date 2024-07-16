@@ -97,12 +97,14 @@ var _ = Describe("DRClusterMModeTests", Ordered, func() {
 				Kind:       "RamenConfig",
 				APIVersion: rmn.GroupVersion.String(),
 			},
-			LeaderElection: &config.LeaderElectionConfiguration{
-				LeaderElect:  new(bool),
-				ResourceName: ramencontrollers.HubLeaderElectionResourceName,
-			},
-			Metrics: rmn.ControllerMetrics{
-				BindAddress: "0", // Disable metrics
+			ControllerManagerConfigurationSpec: controller_runtime_config.ControllerManagerConfigurationSpec{
+				LeaderElection: &config.LeaderElectionConfiguration{
+					LeaderElect:  new(bool),
+					ResourceName: ramencontrollers.HubLeaderElectionResourceName,
+				},
+				Metrics: controller_runtime_config.ControllerMetrics{
+					BindAddress: "0", // Disable metrics
+				},
 			},
 			RamenControllerType: rmn.DRHubType,
 			S3StoreProfiles: []rmn.S3StoreProfile{

@@ -82,8 +82,9 @@ func bindFlags(bindfuncs ...func(*flag.FlagSet)) {
 func buildOptions() (*ctrl.Options, *ramendrv1alpha1.RamenConfig) {
 	ctrlOptions := ctrl.Options{Scheme: scheme}
 
-	ramenConfig := controllers.LoadControllerConfig(configFile, setupLog)
-	controllers.LoadControllerOptions(&ctrlOptions, ramenConfig)
+        ramenConfig := &ramendrv1alpha1.RamenConfig{}
+
+	controllers.LoadControllerConfig(configFile, setupLog, &ctrlOptions, ramenConfig)
 
 	return &ctrlOptions, ramenConfig
 }
