@@ -43,6 +43,17 @@ def get(*args, context=None):
     return _run("get", *args, context=context)
 
 
+def kustomize(src, load_restrictor=None):
+    """
+    Run kubectl kustomize ... and return the output.
+    """
+    args = []
+    if load_restrictor:
+        args.append(f"--load-restrictor={load_restrictor}")
+    args.append(src)
+    return _run("kustomize", *args)
+
+
 def describe(*args, context=None):
     return _run("describe", *args, context=context)
 
@@ -175,6 +186,18 @@ def watch(
         cmd.append(f"--context={context}")
 
     return commands.watch(*cmd, timeout=timeout)
+
+
+def gather(contexts, namespaces=None, directory=None):
+    """
+    Run kubectl gather plugin.
+    """
+    cmd = ["kubectl", "gather", "--contexts", ",".join(contexts)]
+    if namespaces:
+        cmd.extend(("--namespaces", ",".join(namespaces)))
+    if directory:
+        cmd.extend(("--directory", directory))
+    commands.run(*cmd)
 
 
 def _run(cmd, *args, context=None):

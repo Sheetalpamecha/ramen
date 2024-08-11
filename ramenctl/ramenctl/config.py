@@ -26,8 +26,6 @@ def run(args):
     if env["hub"]:
         hub_cm = generate_config_map("hub", env, args)
 
-        wait_for_ramen_hub_operator(env["hub"], args)
-
         create_ramen_s3_secrets(env["hub"], s3_secrets)
 
         create_ramen_config_map(env["hub"], hub_cm)
@@ -42,18 +40,6 @@ def run(args):
         for cluster in env["clusters"]:
             create_ramen_s3_secrets(cluster, s3_secrets)
             create_ramen_config_map(cluster, dr_cluster_cm)
-
-
-def wait_for_ramen_hub_operator(hub, args):
-    command.info("Waiting until ramen-hub-operator is rolled out")
-    kubectl.rollout(
-        "status",
-        "deploy/ramen-hub-operator",
-        f"--namespace={args.ramen_namespace}",
-        "--timeout=180s",
-        context=hub,
-        log=command.debug,
-    )
 
 
 def generate_ramen_s3_secrets(clusters, args):
@@ -108,7 +94,7 @@ def wait_for_secret_propagation(hub, clusters, args):
             f"policy/{policy}",
             output="jsonpath={.status}",
             namespace=cluster,
-            timeout=30,
+            timeout=60,
             profile=hub,
             log=command.debug,
         )
@@ -116,7 +102,7 @@ def wait_for_secret_propagation(hub, clusters, args):
         kubectl.wait(
             f"policy/{policy}",
             "--for=jsonpath={.status.compliant}=Compliant",
-            "--timeout=30s",
+            "--timeout=60s",
             f"--namespace={cluster}",
             context=hub,
             log=command.debug,
