@@ -26,6 +26,9 @@ def deploy(cluster):
         context=cluster,
     )
 
+    template = drenv.template("snapshot-class.yaml")
+    yaml = template.substitute(cluster=cluster)
+    kubectl.apply("--filename=-", input=yaml, context=cluster)
 
 def wait(cluster):
     print("Waiting until ceph block pool is ready")
