@@ -5,7 +5,6 @@ package dractions
 
 import (
 	"strings"
-	"time"
 
 	ramen "github.com/ramendr/ramen/api/v1alpha1"
 	"github.com/ramendr/ramen/e2e/deployers"
@@ -17,8 +16,6 @@ import (
 
 const (
 	OcmSchedulingDisable = "cluster.open-cluster-management.io/experimental-scheduling-disable"
-
-	FiveSecondsDuration = 5 * time.Second
 )
 
 // If AppSet/Subscription, find Placement
@@ -126,7 +123,7 @@ func Failover(ctx types.Context) error {
 
 	log.Info("Failing over workload")
 
-	return failoverRelocate(ctx, ramen.ActionFailover)
+	return failoverRelocate(ctx, ramen.ActionFailover, ramen.FailedOver)
 }
 
 // Determine DRPC
@@ -143,10 +140,11 @@ func Relocate(ctx types.Context) error {
 
 	log.Info("Relocating workload")
 
-	return failoverRelocate(ctx, ramen.ActionRelocate)
+	return failoverRelocate(ctx, ramen.ActionRelocate, ramen.Relocated)
 }
 
-func failoverRelocate(ctx types.Context, action ramen.DRAction) error {
+func failoverRelocate(ctx types.Context, action ramen.DRAction, state ramen.DRState) error {
+	drpcName := ctx.Name()
 	name := ctx.Name()
 	namespace := ctx.Namespace()
 	drpcName := name
@@ -156,11 +154,11 @@ func failoverRelocate(ctx types.Context, action ramen.DRAction) error {
 		return err
 	}
 
-	if action == ramen.ActionFailover {
-		return waitDRPC(ctx, client, namespace, name, ramen.FailedOver)
+	if err := waitDRPCPhase(ctx, client, namespace, drpcName, state); err != nil {
+		return err
 	}
 
-	return waitDRPC(ctx, client, namespace, name, ramen.Relocated)
+	return waitDRPCReady(ctx, client, namespace, drpcName)
 }
 
 func waitAndUpdateDRPC(
