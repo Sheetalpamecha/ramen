@@ -200,7 +200,7 @@ func waitDRPCProgression(
 	ctx types.Context,
 	client client.Client,
 	namespace, name string,
-	progression ramen.ProgressionStatus,
+	progression ramen.ProgressionStatus, consistently bool
 ) error {
 	log := ctx.Logger()
 	startTime := time.Now()

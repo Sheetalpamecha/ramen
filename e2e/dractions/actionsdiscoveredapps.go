@@ -131,7 +131,7 @@ func failoverRelocateDiscoveredApps(ctx types.Context, action ramen.DRAction) er
 		return err
 	}
 
-	if err := waitDRPCProgression(ctx, client, namespace, name, ramen.ProgressionWaitOnUserToCleanUp); err != nil {
+	if err := waitDRPCProgression(ctx, client, namespace, name, ramen.ProgressionWaitOnUserToCleanUp, true); err != nil {
 		return err
 	}
 
@@ -142,7 +142,7 @@ func failoverRelocateDiscoveredApps(ctx types.Context, action ramen.DRAction) er
 		return err
 	}
 
-	if err = waitDRPCProgression(ctx, client, namespace, name, ramen.ProgressionCompleted); err != nil {
+	if err = waitDRPCProgression(ctx, client, namespace, name, ramen.ProgressionCompleted, false); err != nil {
 		return err
 	}
 
