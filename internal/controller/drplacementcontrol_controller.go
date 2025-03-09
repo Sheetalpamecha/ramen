@@ -278,14 +278,16 @@ func (r *DRPlacementControlReconciler) setLastSyncTimeMetric(syncMetrics *SyncTi
 	}
 
 	log.Info(fmt.Sprintf("Setting metric: (%s)", LastSyncTimestampSeconds))
+	var value float64
 
 	if t == nil {
-		syncMetrics.LastSyncTime.Set(0)
-
-		return
+		value = 0
+	} else {
+		value = float64(t.ProtoTime().Seconds)
 	}
 
-	syncMetrics.LastSyncTime.Set(float64(t.ProtoTime().Seconds))
+	syncMetrics.LastSyncTime.Set(value)
+	log.Info(fmt.Sprintf("metric (%s) set with value: (%f)", LastSyncTimestampSeconds, value))
 }
 
 func (r *DRPlacementControlReconciler) setLastSyncDurationMetric(syncDurationMetrics *SyncDurationMetrics,
@@ -296,14 +298,16 @@ func (r *DRPlacementControlReconciler) setLastSyncDurationMetric(syncDurationMet
 	}
 
 	log.Info(fmt.Sprintf("setting metric: (%s)", LastSyncDurationSeconds))
+	var value float64
 
 	if t == nil {
-		syncDurationMetrics.LastSyncDuration.Set(0)
-
-		return
+		value = 0
+	} else {
+		value = t.Seconds()
 	}
 
-	syncDurationMetrics.LastSyncDuration.Set(t.Seconds())
+	syncDurationMetrics.LastSyncDuration.Set(value)
+	log.Info(fmt.Sprintf("metric (%s) set with value: (%f)", LastSyncDurationSeconds, value))
 }
 
 func (r *DRPlacementControlReconciler) setLastSyncBytesMetric(syncDataBytesMetrics *SyncDataBytesMetrics,
@@ -314,14 +318,16 @@ func (r *DRPlacementControlReconciler) setLastSyncBytesMetric(syncDataBytesMetri
 	}
 
 	log.Info(fmt.Sprintf("setting metric: (%s)", LastSyncDataBytes))
+	var value float64
 
 	if b == nil {
-		syncDataBytesMetrics.LastSyncDataBytes.Set(0)
-
-		return
+		value = 0
+	} else {
+		value = float64(*b)
 	}
 
-	syncDataBytesMetrics.LastSyncDataBytes.Set(float64(*b))
+	syncDataBytesMetrics.LastSyncDataBytes.Set(value)
+	log.Info(fmt.Sprintf("metric (%s) set with value: (%f)", LastSyncDataBytes, value))
 }
 
 // setWorkloadProtectionMetric sets the workload protection info metric, where 0 indicates not protected and
@@ -346,6 +352,7 @@ func (r *DRPlacementControlReconciler) setWorkloadProtectionMetric(workloadProte
 	}
 
 	workloadProtectionMetrics.WorkloadProtectionStatus.Set(float64(protected))
+	log.Info(fmt.Sprintf("metric (%s) set with value: (%d)", WorkloadProtectionStatus, protected))
 }
 
 //nolint:funlen
