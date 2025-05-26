@@ -32,9 +32,7 @@ func (d DiscoveredApp) Deploy(ctx types.TestContext) error {
 	// Deploys the application on the first DR cluster (c1).
 	cluster := ctx.Env().C1
 
-	// Create namespace on the first DR cluster (c1)
-	err := util.CreateNamespace(ctx, cluster, appNamespace)
-	if err != nil {
+	if err := util.CreateAppNamespaces(ctx, ctx.AppNamespace()); err != nil {
 		return err
 	}
 
