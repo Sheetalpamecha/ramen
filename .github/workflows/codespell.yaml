@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: The RamenDR authors
+# SPDX-License-Identifier: Apache-2.0
+
+---
+name: Codespell Check
+
+on:
+  pull_request:
+
+jobs:
+  codespell:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Codespell
+        run: pip3 install codespell
+
+      - name: Run Codespell
+        run: codespell --config .codespellrc
