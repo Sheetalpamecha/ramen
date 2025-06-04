@@ -17,21 +17,25 @@ SHARED_NETWORK = "$network"
 
 X86_64 = "x86_64"
 ARM64 = "arm64"
+AARCH64 = "aarch64"
 
 _PLATFORM_DEFAULTS = {
     "__default__": {
         PROVIDER: {
             X86_64: "",
             ARM64: "",
+            AARCH64: "",
         },
         VM: {
             X86_64: "",
             ARM64: "",
+            AARCH64: "",
         },
         CONTAINER: "",
         SHARED_NETWORK: {
             X86_64: "",
             ARM64: "",
+            AARCH64: "",
         },
     },
     "linux": {

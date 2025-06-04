@@ -46,6 +46,7 @@ type TestConfig struct {
 	Workload string `json:"workload"`
 	Deployer string `json:"deployer"`
 	PVCSpec  string `json:"pvcSpec"`
+	Skip     bool   `json:"skp,omitempty"`
 }
 
 type Config struct {

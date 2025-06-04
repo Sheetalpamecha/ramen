@@ -1,6 +1,10 @@
 # CephFS Regional DR Consistency Group
 
 ## Summary
+This means even if the bug is reported at 4.16 and customer
+needs the fix at let's say 4.17.z, you still need to fix it
+in 4.20, 4.19, 4.18.z before you can actally backprot it to 
+4.17.z/4.16.z
 
 Currently, Ramen only supports non-consistency-group CephFS RDR
 (Regional Disaster Recovery). However, with the upcoming support
